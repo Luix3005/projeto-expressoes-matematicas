@@ -16,7 +16,9 @@ backend/data/
 *.trace.db
 
 # Local/editor files
-.vscode/
+.vscode/*
+!.vscode/launch.json
+!.vscode/settings.json
 .idea/
 *.iml
 .DS_Store
@@ -24,9 +26,9 @@ Thumbs.db
 
 # Old folder kept out if Windows is still locking it
 calculadora-frontend/
+calculator/
 
 # Logs
 *.log
 npm-debug.log*
 yarn-error.log*
-
