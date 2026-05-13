@@ -101,7 +101,6 @@ export class Historico implements OnInit {
 }
 salvarNovaExpressao() {
   if (this.expressaoInput) {
-    // Chama o salvar passando a expressão e o X
     this.service.salvar(this.expressaoInput, this.valorXInput ?? undefined).subscribe({
       next: () => {
         this.expressaoInput = '';
