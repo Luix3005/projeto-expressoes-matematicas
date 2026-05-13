@@ -8,6 +8,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.data.domain.Sort;
 
 @RestController
 @RequestMapping("/api/calculator")
@@ -34,7 +35,7 @@ public class ExpressionController {
         @RequestParam(required = false) String dataStr,
         @RequestParam(required = false) String criador
     ) {
-        Pageable pageable = PageRequest.of(page, size);
+        Pageable pageable = PageRequest.of(page, size, Sort.by("createdAt").descending());
         Page<Expression> resultado = service.listar(termo, dataStr, criador, pageable);
         return ResponseEntity.ok(resultado);
     }

@@ -19,7 +19,8 @@ export class ExpressionService {
   listar(pagina: number, itensPorPagina: number, termo?: string, data?: string, criador?: string): Observable<ExpressionPage> {
   let params = new HttpParams()
     .set('page', pagina.toString())
-    .set('size', itensPorPagina.toString());
+    .set('size', itensPorPagina.toString())
+    .set('sort', 'createdAt,desc');
 
   if (termo) {
     params = params.set('termo', termo);
