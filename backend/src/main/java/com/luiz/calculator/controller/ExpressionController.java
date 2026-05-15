@@ -19,11 +19,8 @@ public class ExpressionController {
     private ExpressionService service;
 
     @PostMapping
-    public Expression salvar(
-        @RequestParam String textoDaConta,
-        @RequestParam(required = false) Double valorX
-    ) {
-        return service.salvar(textoDaConta, valorX);
+    public Expression salvar(@RequestBody CalculoRequest dados) {
+        return service.salvar(dados.getExpressao(), dados.getVariaveis());
     }
 
     
@@ -48,9 +45,8 @@ public class ExpressionController {
     @PutMapping("/{id}")
     public Expression editar(
         @PathVariable Long id, 
-        @RequestParam String novoTexto, 
-        @RequestParam(required = false) Double valorX
+        @RequestBody CalculoRequest dados
     ) {
-        return service.editar(id, novoTexto, valorX);
+        return service.editar(id, dados.getExpressao(), dados.getVariaveis());
     }
 }

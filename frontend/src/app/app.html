@@ -11,7 +11,7 @@
       
       <div *ngIf="idEmEdicao" style="margin-bottom: 5px;">
         <span class="badge bg-warning text-dark">Modo Edição (ID: {{idEmEdicao}})</span>
-        <button (click)="idEmEdicao = null; novaConta = ''" class="btn btn-link btn-sm text-decoration-none">
+        <button (click)="idEmEdicao = null; novaConta = ''; nomesVariaveis = []" class="btn btn-link btn-sm text-decoration-none">
           Cancelar e criar nova
         </button>
       </div>
@@ -20,8 +20,9 @@
         <input 
           type="text" 
           [(ngModel)]="novaConta"
+          (input)="detectarVariaveis()" 
           name="expressao"
-          placeholder="Ex: 10 + 5 * 2 ou x * 2" 
+          placeholder="Ex: 15 / (3 + x + y)" 
           style="flex: 1; padding: 12px; border: 1px solid #ccc; border-radius: 4px; font-size: 16px;"
         >
         
@@ -33,14 +34,20 @@
         </button>
       </div>
 
-      <div *ngIf="novaConta.toLowerCase().includes('x')" style="display: flex; align-items: center; gap: 10px;">
-        <label style="font-weight: bold; color: #28a745;">Valor de X:</label>
-        <input 
-          type="number" 
-          [(ngModel)]="valorX"
-          placeholder="0"
-          style="width: 100px; padding: 8px; border: 1px solid #28a745; border-radius: 4px;"
-        >
+      <div *ngIf="nomesVariaveis.length > 0" style="background: #e9ecef; padding: 15px; border-radius: 6px;">
+        <p style="margin: 0 0 10px 0; font-weight: bold; color: #28a745;">Defina os valores das variáveis:</p>
+        
+        <div style="display: flex; flex-wrap: wrap; gap: 15px;">
+          <div *ngFor="let nome of nomesVariaveis" style="display: flex; align-items: center; gap: 8px;">
+            <label style="font-weight: bold; color: #333;">{{ nome }}:</label>
+            <input 
+              type="number" 
+              [(ngModel)]="variaveisMap[nome]"
+              placeholder="0"
+              style="width: 80px; padding: 8px; border: 1px solid #28a745; border-radius: 4px;"
+            >
+          </div>
+        </div>
       </div>
 
     </div>

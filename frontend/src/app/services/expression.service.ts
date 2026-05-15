@@ -17,48 +17,38 @@ export class ExpressionService {
   constructor(private http: HttpClient) {}
 
   listar(pagina: number, itensPorPagina: number, termo?: string, data?: string, criador?: string): Observable<ExpressionPage> {
-  let params = new HttpParams()
-    .set('page', pagina.toString())
-    .set('size', itensPorPagina.toString())
-    .set('sort', 'createdAt,desc');
+    let params = new HttpParams()
+      .set('page', pagina.toString())
+      .set('size', itensPorPagina.toString())
+      .set('sort', 'createdAt,desc');
 
-  if (termo) {
-    params = params.set('termo', termo);
-  }
-  
-  if (data) {
-    params = params.set('dataStr', data);
-  }
+    if (termo) params = params.set('termo', termo);
+    if (data) params = params.set('dataStr', data);
+    if (criador) params = params.set('criador', criador);
 
-  if (criador) {
-    params = params.set('criador', criador);
+    return this.http.get<ExpressionPage>(`${this.apiUrl}/todos`, { params });
   }
-
-  return this.http.get<ExpressionPage>(`${this.apiUrl}/todos`, { params });
-}
 
   excluir(id: number): Observable<void> {
     return this.http.delete<void>(`${this.apiUrl}/${id}`);
   }
 
-  salvar(expressao: string, valorX?: number): Observable<Expression> {
-    let params = new HttpParams().set('textoDaConta', expressao);
-    
-    if (valorX !== undefined && valorX !== null) {
-      params = params.set('valorX', valorX.toString());
-    }
-    
+  salvar(expressao: string, variaveis: { [key: string]: number }): Observable<Expression> {
+    const corpo = {
+      expressao: expressao,
+      variaveis: variaveis
+    };
 
-    return this.http.post<Expression>(this.apiUrl, null, { params });
+    // No POST, o segundo parâmetro é o corpo (body) da requisição
+    return this.http.post<Expression>(this.apiUrl, corpo);
   }
 
-  editar(id: number, expressao: string, valorX?: number): Observable<Expression> {
-    let params = new HttpParams().set('novoTexto', expressao);
-    
-    if (valorX !== undefined && valorX !== null) {
-      params = params.set('valorX', valorX.toString());
-    }
+  editar(id: number, expressao: string, variaveis: { [key: string]: number }): Observable<Expression> {
+    const corpo = {
+      expressao: expressao,
+      variaveis: variaveis
+    };
 
-    return this.http.put<Expression>(`${this.apiUrl}/${id}`, null, { params });
+    return this.http.put<Expression>(`${this.apiUrl}/${id}`, corpo);
   }
 }

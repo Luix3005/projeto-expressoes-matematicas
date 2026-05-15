@@ -2,7 +2,7 @@ package com.luiz.calculator.service;
 
 import com.luiz.calculator.model.Expression;
 import com.luiz.calculator.repository.ExpressionRepository;
-import net.objecthunter.exp4j.ExpressionBuilder;
+import com.luiz.calculator.controller.ExpressionEvaluator; // Importando seu motor raiz
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.data.domain.Page;
@@ -14,6 +14,7 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map; // Importante para as múltiplas variáveis
 
 @Service
 public class ExpressionService {
@@ -21,7 +22,7 @@ public class ExpressionService {
     @Autowired
     private ExpressionRepository repository;
 
-    public Expression salvar(String textoDaConta, Double valorX) {
+    public Expression salvar(String textoDaConta, Map<String, Double> variaveis) {
         Expression entidade = new Expression();
         String contaLimpa = textoDaConta.trim();
 
@@ -30,18 +31,18 @@ public class ExpressionService {
         entidade.setLastExecutedAt(LocalDateTime.now());
         entidade.setCreatedBy("Luiz Felipe");
 
-        entidade.setResult(calcularLogica(contaLimpa, valorX));
+        entidade.setResult(calcularLogica(contaLimpa, variaveis));
 
         return repository.save(entidade);
     }
 
-    public Expression editar(Long id, String novoTexto, Double valorX) {
+    public Expression editar(Long id, String novoTexto, Map<String, Double> variaveis) {
         Expression entidade = repository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Expressao nao encontrada"));
 
         String contaLimpa = novoTexto.trim();
         entidade.setExpression(contaLimpa);
-        entidade.setResult(calcularLogica(contaLimpa, valorX));
+        entidade.setResult(calcularLogica(contaLimpa, variaveis));
         entidade.setLastExecutedAt(LocalDateTime.now());
 
         return repository.save(entidade);
@@ -51,19 +52,10 @@ public class ExpressionService {
         repository.deleteById(id);
     }
 
-    private Double calcularLogica(String expressao, Double valorX) {
+    private Double calcularLogica(String expressao, Map<String, Double> variaveis) {
         try {
-            String expressaoFormatada = expressao.toLowerCase();
-            ExpressionBuilder builder = new ExpressionBuilder(expressaoFormatada);
-
-            if (expressaoFormatada.contains("x")) {
-                builder.variable("x");
-                net.objecthunter.exp4j.Expression e = builder.build();
-                e.setVariable("x", (valorX != null) ? valorX : 0.0);
-                return e.evaluate();
-            } else {
-                return builder.build().evaluate();
-            }
+            // Chamamos o seu Evaluator raiz que resolve parênteses e variáveis
+            return ExpressionEvaluator.avaliar(expressao, variaveis);
         } catch (Exception e) {
             System.out.println("Erro ao calcular [" + expressao + "]: " + e.getMessage());
             return null;
@@ -91,7 +83,6 @@ public class ExpressionService {
 
         } catch (Exception e) {
             System.err.println("Erro ao filtrar expressoes: " + e.getMessage());
-            e.printStackTrace();
             return Page.empty(pageable);
         }
     }
@@ -106,22 +97,18 @@ public class ExpressionService {
     private Specification<Expression> criarFiltro(String busca, String criadorBusca, LocalDateTime inicio, LocalDateTime fim) {
         return (root, query, cb) -> {
             List<Predicate> filtros = new ArrayList<>();
-
             if (busca != null) {
                 String texto = "%" + busca.toLowerCase() + "%";
                 Predicate porExpressao = cb.like(cb.lower(root.get("expression")), texto);
                 Predicate porCriador = cb.like(cb.lower(root.get("createdBy")), texto);
                 filtros.add(cb.or(porExpressao, porCriador));
             }
-
             if (criadorBusca != null) {
                 filtros.add(cb.like(cb.lower(root.get("createdBy")), "%" + criadorBusca.toLowerCase() + "%"));
             }
-
             if (inicio != null && fim != null) {
                 filtros.add(cb.between(root.get("createdAt"), inicio, fim));
             }
-
             return cb.and(filtros.toArray(new Predicate[0]));
         };
     }

@@ -83,31 +83,39 @@ export class Historico implements OnInit {
   }
   }
 
-  executar(item: Expression) {
-  if (item.id && item.expression) {
-    console.log('Recalculando:', item.expression);
-    
-    this.service.editar(item.id, item.expression).subscribe({
-      next: (resultadoAtualizado) => {
-        console.log('Recalculado com sucesso:', resultadoAtualizado);
-        this.carregarDados();
-      },
-      error: (err) => {
-        console.error('Erro ao executar expressão:', err);
-        alert('Erro ao calcular a expressão. Verifique a sintaxe.');
-      }
-    });
+executar(item: Expression) {
+    if (item.id && item.expression) {
+      // Como o service agora EXIGE um mapa, enviamos um objeto vazio
+      // ou a lógica de detecção de variáveis.
+      const variaveisMapa: { [key: string]: number } = {}; 
+
+      this.service.editar(item.id, item.expression, variaveisMapa).subscribe({
+        next: (resultadoAtualizado) => {
+          this.carregarDados();
+        },
+        error: (err) => {
+          console.error('Erro ao executar expressão:', err);
+        }
+      });
+    }
   }
-}
-salvarNovaExpressao() {
-  if (this.expressaoInput) {
-    this.service.salvar(this.expressaoInput, this.valorXInput ?? undefined).subscribe({
-      next: () => {
-        this.expressaoInput = '';
-        this.valorXInput = null;
-        this.carregarDados();
+
+  salvarNovaExpressao() {
+    if (this.expressaoInput) {
+      const variaveisMapa: { [key: string]: number } = {};
+      
+      if (this.valorXInput !== null) {
+        variaveisMapa['x'] = this.valorXInput;
       }
-    });
+
+      this.service.salvar(this.expressaoInput, variaveisMapa).subscribe({
+        next: () => {
+          this.expressaoInput = '';
+          this.valorXInput = null;
+          this.carregarDados();
+        },
+        error: (err) => console.error('Erro ao salvar:', err)
+      });
+    }
   }
-}
 }
