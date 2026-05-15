@@ -2,7 +2,7 @@ package com.luiz.calculator.service;
 
 import com.luiz.calculator.model.Expression;
 import com.luiz.calculator.repository.ExpressionRepository;
-import com.luiz.calculator.controller.ExpressionEvaluator; // Importando seu motor raiz
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.data.domain.Page;

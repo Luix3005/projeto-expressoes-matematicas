@@ -1,5 +1,6 @@
 package com.luiz.calculator.controller;
 
+import com.luiz.calculator.model.CalculoRequest;
 import com.luiz.calculator.model.Expression;
 import com.luiz.calculator.service.ExpressionService;
 import org.springframework.beans.factory.annotation.Autowired;
